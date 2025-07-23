@@ -24,14 +24,14 @@ jobs:
     - name: Setup vcpkg
       run: |
         C:\vcpkg\vcpkg.exe integrate install
-        C:\vcpkg\vcpkg.exe install gtest nlohmann-json
+        C:\vcpkg\vcpkg.exe install gtest nlohmann-json openssl
 
-    - name: Install OpenSSL
-    #   run: powershell.exe ./.github/workflows/Install-OpenSSL.ps1
-      shell: powershell
-      run: |
-        echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
-        C:\vcpkg\vcpkg.exe install openssl:x64-windows-static-md
+    # - name: Install OpenSSL
+    # #   run: powershell.exe ./.github/workflows/Install-OpenSSL.ps1
+    #   shell: powershell
+    #   run: |
+    #     echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
+    #     C:\vcpkg\vcpkg.exe install openssl:x64-windows-static-md
 
     - name: Build tests
       run: |
