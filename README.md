@@ -44,11 +44,13 @@ int main() {
     std::string gcm_ciphertext = encrypt_gcm(message, passphrase);
     std::string gcm_decrypted = decrypt_gcm(gcm_ciphertext, passphrase);
 
-    std::cout << "Decrypted: " << decrypted << std::endl;
+    std::cout << "Decrypted: " << gcm_decrypted << std::endl;
 
     // Example with CBC mode
     std::string cbc_ciphertext = encrypt_cbc(message, passphrase);
     std::string cbc_decrypted = decrypt_cbc(cbc_ciphertext, passphrase);
+
+    std::cout << "Decrypted: " << cbc_decrypted << std::endl;
 
     return 0;
 }
