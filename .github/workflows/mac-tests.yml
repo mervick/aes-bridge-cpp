@@ -1,0 +1,34 @@
+name: Tests on macOS
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        brew update
+        brew install cmake
+        brew install gtest
+        brew install nlohmann-json
+        brew install openssl@3
+
+    - name: Set up environment for OpenSSL
+      run: |
+        echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> $GITHUB_ENV
+        echo "CPATH=$(brew --prefix openssl@3)/include" >> $GITHUB_ENV
+        echo "LIBRARY_PATH=$(brew --prefix openssl@3)/lib" >> $GITHUB_ENV
+
+    - name: Build tests
+      run: |
+        cmake .
+        make
+
+    - name: Run tests
+      run: |
+        ctest --verbose
