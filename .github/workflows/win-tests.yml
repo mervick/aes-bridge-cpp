@@ -15,6 +15,9 @@ jobs:
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         choco install ninja
 
+    - name: Install Google Test
+      uses: Bacondish2023/setup-googletest@v1
+
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
@@ -24,7 +27,11 @@ jobs:
     - name: Setup vcpkg
       run: |
         C:\vcpkg\vcpkg.exe integrate install
-        C:\vcpkg\vcpkg.exe install gtest nlohmann-json openssl
+        C:\vcpkg\vcpkg.exe install gtest:x64-windows
+        C:\vcpkg\vcpkg.exe install nlohmann-json:x64-windows
+        C:\vcpkg\vcpkg.exe install openssl:x64-windows
+
+    # C:\vcpkg\vcpkg.exe list gtest
 
     # - name: Install OpenSSL
     # #   run: powershell.exe ./.github/workflows/Install-OpenSSL.ps1
