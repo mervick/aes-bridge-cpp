@@ -1,0 +1,37 @@
+name: Tests on Linux
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake
+        sudo apt install -y libgtest-dev
+        sudo apt install -y nlohmann-json3-dev
+
+    - name: Build Google Test
+      run: |
+        cd /usr/src/googletest
+        sudo cmake .
+        sudo make
+        sudo mv lib/libgtest* /usr/local/lib/
+        sudo mv googletest/include/gtest /usr/local/include/
+
+    - name: Build tests
+      run: |
+        cd ${{github.workspace}}
+        cmake .
+        make
+
+    - name: Run tests
+      run: |
+        cd ${{github.workspace}}/build
+        ctest --verbose
