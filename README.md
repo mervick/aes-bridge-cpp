@@ -1,7 +1,7 @@
 # AesBridge CPP
 
-![CI Status](https://github.com/mervick/aes-bridge-python/actions/workflows/linux-tests.yml/badge.svg)
-![CI Status](https://github.com/mervick/aes-bridge-python/actions/workflows/mac-tests.yml/badge.svg)
+![CI Status](https://github.com/mervick/aes-bridge-cpp/actions/workflows/linux-tests.yml/badge.svg)
+![CI Status](https://github.com/mervick/aes-bridge-cpp/actions/workflows/mac-tests.yml/badge.svg)
 
 **AesBridge** is a modern, secure, and cross-language **AES** encryption library. It offers a unified interface for encrypting and decrypting data across multiple programming languages. Supports **GCM**, **CBC**, and **legacy AES Everywhere** modes.
 
