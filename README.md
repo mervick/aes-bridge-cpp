@@ -5,6 +5,9 @@
 
 **AesBridge** is a modern, secure, and cross-language **AES** encryption library. It offers a unified interface for encrypting and decrypting data across multiple programming languages. Supports **GCM**, **CBC**, and **legacy AES Everywhere** modes.
 
+This is the **C++ implementation** of the core project.  
+👉 Main repository: https://github.com/mervick/aes-bridge
+
 ## Features
 
   - 🔐 AES-256 encryption in GCM (recommended) and CBC modes.
