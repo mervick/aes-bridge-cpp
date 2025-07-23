@@ -28,8 +28,8 @@ encrypt_cbc_bin(const std::vector<unsigned char>& data, const std::vector<unsign
  * ciphertext (variable length) + HMAC tag (32 bytes).
  * @throws std::runtime_error on encryption or HMAC failure.
  */
-std::vector<unsigned char>
-encrypt_cbc_bin(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
+std::string
+encrypt_cbc_bin(const std::string& data, const std::string& passphrase);
 
 /**
  * @brief Decrypts data encrypted with encrypt_cbc_bin() function.
