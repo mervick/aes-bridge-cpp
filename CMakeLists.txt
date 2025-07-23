@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(AES_BRIDGE CXX)
+project(AesBridge CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# COMPONENTS specify which parts of OpenSSL are needed (Crypto, SSL)
 find_package(OpenSSL REQUIRED COMPONENTS Crypto SSL)
 
 add_executable(aes_bridge_app
@@ -27,5 +26,6 @@ target_include_directories(aes_bridge_app PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Optional: Install rules to install executable
-# install(TARGETS aes_bridge_app DESTINATION bin)
+enable_testing()
+add_subdirectory(tests)
+
