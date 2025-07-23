@@ -27,11 +27,9 @@ jobs:
 
     - name: Build tests
       run: |
-        cd ${{github.workspace}}
         cmake .
         make
 
     - name: Run tests
       run: |
-        cd ${{github.workspace}}/build
         ctest --verbose
