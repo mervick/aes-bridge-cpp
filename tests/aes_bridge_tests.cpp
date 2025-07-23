@@ -9,6 +9,9 @@
 
 std::vector<unsigned char> hexToBytes(const std::string& hex) {
     std::vector<unsigned char> bytes;
+    if (hex.length() % 2 != 0) {
+        throw std::invalid_argument("Hex string length must be even.");
+    }
     for (size_t i = 0; i < hex.length(); i += 2) {
         std::string byteString = hex.substr(i, 2);
         unsigned char byte = static_cast<unsigned char>(strtol(byteString.c_str(), NULL, 16));
@@ -44,7 +47,7 @@ protected:
                 file >> test_data_json;
                 data_loaded = true;
             } else {
-                FAIL() << "Unable to open tests/test_data.json. Make sure the file exists and path is correct.";
+                FAIL() << "Unable to open test_data.json. Make sure the file exists and path is correct.";
             }
         }
     }
@@ -211,11 +214,15 @@ TEST_F(AesBridgeTest, DecryptGcmTests) {
     for (const auto& test_case : decrypt_cases) {
         std::string test_id = test_case.count("id") ? test_case["id"].get<std::string>() : "unknown_id";
 
+        std::string plaintext;
         std::vector<unsigned char> plaintext_bytes;
+
         if (test_case.count("plaintext") && !test_case["plaintext"].is_null()) {
-            plaintext_bytes = stringToBytes(test_case["plaintext"].get<std::string>());
+            plaintext = test_case["plaintext"].get<std::string>();
+            plaintext_bytes = stringToBytes(plaintext);
         } else if (test_case.count("hex") && !test_case["hex"].is_null()) {
             plaintext_bytes = hexToBytes(test_case["hex"].get<std::string>());
+            plaintext = bytesToString(plaintext_bytes);
         } else {
             continue;
         }
@@ -224,15 +231,21 @@ TEST_F(AesBridgeTest, DecryptGcmTests) {
             continue;
         }
 
-        std::string passphrase = test_case["passphrase"].get<std::string>();
-        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
-
         if (test_case.count("encrypted-gcm") && !test_case["encrypted-gcm"].is_null()) {
-            std::string encrypted_gcm_str = test_case["encrypted-gcm"].get<std::string>();
-            std::vector<unsigned char> encrypted_gcm_bytes = stringToBytes(encrypted_gcm_str);
-            ASSERT_NO_THROW(decrypt_gcm(encrypted_gcm_bytes, passphrase_bytes)) << "Failed for test ID: " << test_id;
-            std::vector<unsigned char> decrypted = decrypt_gcm(encrypted_gcm_bytes, passphrase_bytes);
-            ASSERT_EQ(plaintext_bytes, decrypted) << "GCM decryption failed for test ID: " << test_id;
+            std::string passphrase = test_case["passphrase"].get<std::string>();
+            std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+            std::string encrypted_gcm = test_case["encrypted-gcm"].get<std::string>();
+            std::vector<unsigned char> encrypted_gcm_bytes = stringToBytes(encrypted_gcm);
+
+            // Test std::vector<unsigned char> decryption
+            ASSERT_NO_THROW(decrypt_gcm(encrypted_gcm_bytes, passphrase_bytes)) << "Failed for test ID: " << test_id << ", std::vector<unsigned char> decryption failed";
+            std::vector<unsigned char> decrypted_bytes = decrypt_gcm(encrypted_gcm_bytes, passphrase_bytes);
+            ASSERT_EQ(plaintext_bytes, decrypted_bytes) << "GCM decryption failed for test ID: " << test_id;
+
+            // Test std::string decryption
+            ASSERT_NO_THROW(decrypt_gcm(encrypted_gcm, passphrase)) << "Failed for test ID: " << test_id << ", std::string decryption failed";
+            std::string decrypted = decrypt_gcm(encrypted_gcm, passphrase);
+            ASSERT_EQ(plaintext, decrypted) << "Failed for test ID: " << test_id << ", std::string decryption failed";
         }
     }
 }
@@ -243,11 +256,14 @@ TEST_F(AesBridgeTest, DecryptCbcTests) {
     for (const auto& test_case : decrypt_cases) {
         std::string test_id = test_case.count("id") ? test_case["id"].get<std::string>() : "unknown_id";
 
+        std::string plaintext;
         std::vector<unsigned char> plaintext_bytes;
         if (test_case.count("plaintext") && !test_case["plaintext"].is_null()) {
-            plaintext_bytes = stringToBytes(test_case["plaintext"].get<std::string>());
+            plaintext = test_case["plaintext"].get<std::string>();
+            plaintext_bytes = stringToBytes(plaintext);
         } else if (test_case.count("hex") && !test_case["hex"].is_null()) {
             plaintext_bytes = hexToBytes(test_case["hex"].get<std::string>());
+            plaintext = bytesToString(plaintext_bytes);
         } else {
             continue;
         }
@@ -256,15 +272,21 @@ TEST_F(AesBridgeTest, DecryptCbcTests) {
             continue;
         }
 
-        std::string passphrase = test_case["passphrase"].get<std::string>();
-        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
-
         if (test_case.count("encrypted-cbc") && !test_case["encrypted-cbc"].is_null()) {
-            std::string encrypted_cbc_str = test_case["encrypted-cbc"].get<std::string>();
-            std::vector<unsigned char> encrypted_cbc_bytes = stringToBytes(encrypted_cbc_str);
-            ASSERT_NO_THROW(decrypt_cbc(encrypted_cbc_bytes, passphrase_bytes)) << "Failed for test ID: " << test_id;
-            std::vector<unsigned char> decrypted = decrypt_cbc(encrypted_cbc_bytes, passphrase_bytes);
-            ASSERT_EQ(plaintext_bytes, decrypted) << "CBC decryption failed for test ID: " << test_id;
+            std::string passphrase = test_case["passphrase"].get<std::string>();
+            std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+            std::string encrypted_cbc = test_case["encrypted-cbc"].get<std::string>();
+            std::vector<unsigned char> encrypted_cbc_bytes = stringToBytes(encrypted_cbc);
+
+            // Test std::vector<unsigned char> decryption
+            ASSERT_NO_THROW(decrypt_cbc(encrypted_cbc_bytes, passphrase_bytes)) << "Failed for test ID: " << test_id << ", std::vector<unsigned char> decryption failed";
+            std::vector<unsigned char> decrypted_bytes = decrypt_cbc(encrypted_cbc_bytes, passphrase_bytes);
+            ASSERT_EQ(plaintext_bytes, decrypted_bytes) << "Failed for test ID: " << test_id << ", std::vector<unsigned char> decryption failed";
+
+            // Test std::string decryption
+            ASSERT_NO_THROW(decrypt_cbc(encrypted_cbc, passphrase)) << "Failed for test ID: " << test_id << ", std::string decryption failed";
+            std::string decrypted = decrypt_cbc(encrypted_cbc, passphrase);
+            ASSERT_EQ(plaintext, decrypted) << "Failed for test ID: " << test_id << ", std::string decryption failed";
         }
     }
 }
@@ -275,11 +297,15 @@ TEST_F(AesBridgeTest, DecryptLegacyTests) {
     for (const auto& test_case : decrypt_cases) {
         std::string test_id = test_case.count("id") ? test_case["id"].get<std::string>() : "unknown_id";
 
+        std::string plaintext;
         std::vector<unsigned char> plaintext_bytes;
+
         if (test_case.count("plaintext") && !test_case["plaintext"].is_null()) {
-            plaintext_bytes = stringToBytes(test_case["plaintext"].get<std::string>());
+            plaintext = test_case["plaintext"].get<std::string>();
+            plaintext_bytes = stringToBytes(plaintext);
         } else if (test_case.count("hex") && !test_case["hex"].is_null()) {
             plaintext_bytes = hexToBytes(test_case["hex"].get<std::string>());
+            plaintext = bytesToString(plaintext_bytes);
         } else {
             continue;
         }
@@ -288,15 +314,21 @@ TEST_F(AesBridgeTest, DecryptLegacyTests) {
             continue;
         }
 
-        std::string passphrase = test_case["passphrase"].get<std::string>();
-        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
-
         if (test_case.count("encrypted-legacy") && !test_case["encrypted-legacy"].is_null()) {
-            std::string encrypted_legacy_str = test_case["encrypted-legacy"].get<std::string>();
-            std::vector<unsigned char> encrypted_legacy_bytes = stringToBytes(encrypted_legacy_str);
-            ASSERT_NO_THROW(decrypt_legacy(encrypted_legacy_bytes, passphrase_bytes)) << "Failed for test ID: " << test_id;
-            std::vector<unsigned char> decrypted = decrypt_legacy(encrypted_legacy_bytes, passphrase_bytes);
-            ASSERT_EQ(plaintext_bytes, decrypted) << "Legacy decryption failed for test ID: " << test_id;
+            std::string passphrase = test_case["passphrase"].get<std::string>();
+            std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+            std::string encrypted_legacy = test_case["encrypted-legacy"].get<std::string>();
+            std::vector<unsigned char> encrypted_legacy_bytes = stringToBytes(encrypted_legacy);
+
+            // Test std::vector<unsigned char> decryption
+            ASSERT_NO_THROW(decrypt_legacy(encrypted_legacy_bytes, passphrase_bytes)) << "Failed for test ID: " << test_id << ", std::vector<unsigned char> decryption failed";
+            std::vector<unsigned char> decrypted_bytes = decrypt_legacy(encrypted_legacy_bytes, passphrase_bytes);
+            ASSERT_EQ(plaintext_bytes, decrypted_bytes) << "Failed for test ID: " << test_id << ", std::vector<unsigned char> decryption failed";
+
+            // Test std::string decryption
+            ASSERT_NO_THROW(decrypt_legacy(encrypted_legacy, passphrase)) << "Failed for test ID: " << test_id << ", std::string decryption failed";
+            std::string decrypted = decrypt_legacy(encrypted_legacy, passphrase);
+            ASSERT_EQ(plaintext, decrypted) << "Failed for test ID: " << test_id << ", std::string decryption failed";
         }
     }
 }
