@@ -14,7 +14,7 @@
   - 🔄 Backward Compatible: Supports legacy AES Everywhere format.
 
 
-### Installation
+## Installation
 
 Assuming you're using CMake for your build system, add this project as a Git submodule and include it in your CMake project:
 
@@ -24,7 +24,7 @@ add_subdirectory(path/to/aes-bridge-cpp)
 target_link_libraries(your_project_name PRIVATE aes-bridge)
 ```
 
-### Usage
+## Usage
 
 ```cpp
 #include <string>
