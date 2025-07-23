@@ -14,9 +14,19 @@ jobs:
       run: |
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         choco install ninja
+        choco install git
 
-    - name: Install Google Test
-      uses: Bacondish2023/setup-googletest@v1
+    # - name: Install Google Test
+    #   uses: Bacondish2023/setup-googletest@v1
+    - name: Clone and build Google Test
+      run: |
+        git clone https://github.com/google/googletest.git C:\googletest
+        cd C:\googletest
+        mkdir build
+        cd build
+        cmake -G "Ninja" ..
+        cmake --build .
+        cmake --install . --prefix "C:\gtest_install"
 
     - name: Install vcpkg
       run: |
@@ -42,9 +52,12 @@ jobs:
 
     - name: Build tests
       run: |
-        cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake .
+        mkdir build
+        cd build
+        cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_PREFIX_PATH="C:\gtest_install" .
         cmake --build .
 
     - name: Run tests
       run: |
+        cd build
         ctest --verbose
