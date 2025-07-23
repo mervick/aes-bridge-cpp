@@ -168,3 +168,31 @@ decrypt_gcm(const std::vector<unsigned char>& data, const std::vector<unsigned c
     std::vector<unsigned char> decrypted_bin = decrypt_gcm_bin(decoded_bin, passphrase); // Removed extra data arg
     return decrypted_bin;
 }
+
+// Overloaded functions to handle std::string input/output
+
+std::string
+encrypt_gcm_bin(const std::string& data, const std::string& passphrase)
+{
+    return to_string(encrypt_gcm(to_bytes(data), to_bytes(passphrase)));
+}
+
+
+std::string
+decrypt_gcm_bin(const std::string& data, const std::string& passphrase)
+{
+    return to_string(decrypt_gcm_bin(to_bytes(data), to_bytes(passphrase)));
+}
+
+std::string
+encrypt_gcm(const std::string& data, const std::string& passphrase)
+{
+    return to_string(encrypt_gcm(to_bytes(data), to_bytes(passphrase)));
+}
+
+
+std::string
+decrypt_gcm(const std::string& data, const std::string& passphrase)
+{
+    return to_string(decrypt_gcm(to_bytes(data), to_bytes(passphrase)));
+}

@@ -163,3 +163,17 @@ decrypt_legacy(const std::vector<unsigned char>& data, const std::vector<unsigne
     decrypted_buffer.resize(decrypted_len);
     return decrypted_buffer;
 }
+
+// Overloaded functions to handle std::string input/output
+
+std::string
+encrypt_legacy(const std::string& data, const std::string& passphrase)
+{
+    return to_string(encrypt_legacy(to_bytes(data), to_bytes(passphrase)));
+}
+
+std::string
+decrypt_legacy(const std::string& data, const std::string& passphrase)
+{
+    return to_string(decrypt_legacy(to_bytes(data), to_bytes(passphrase)));
+}

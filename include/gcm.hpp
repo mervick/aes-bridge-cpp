@@ -28,6 +28,17 @@ std::vector<unsigned char>
 encrypt_gcm_bin(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
 
 /**
+ * @brief Encrypts data using AES-256-GCM mode.
+ *
+ * @param data Data to encrypt.
+ * @param passphrase Encryption passphrase.
+ * @return Encrypted data in format: salt (16 bytes) + nonce (12 bytes) + ciphertext (variable length) + tag (16 bytes).
+ * @throws std::runtime_error on encryption failure.
+ */
+std::string
+encrypt_gcm_bin(const std::string& data, const std::string& passphrase);
+
+/**
  * @brief Decrypts data encrypted with encrypt_gcm_bin() function.
  *
  * @param data Encrypted data in format: salt (16 bytes) + nonce (12 bytes) + ciphertext (variable length) + tag (16 bytes).
@@ -37,6 +48,17 @@ encrypt_gcm_bin(const std::vector<unsigned char>& data, const std::vector<unsign
  */
 std::vector<unsigned char>
 decrypt_gcm_bin(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
+
+/**
+ * @brief Decrypts data encrypted with encrypt_gcm_bin() function.
+ *
+ * @param data Encrypted data in format: salt (16 bytes) + nonce (12 bytes) + ciphertext (variable length) + tag (16 bytes).
+ * @param passphrase Passphrase used for encryption.
+ * @return Decrypted plaintext data.
+ * @throws std::runtime_error on decryption or verification failure.
+ */
+std::string
+decrypt_gcm_bin(const std::string& data, const std::string& passphrase);
 
 /**
  * @brief Encrypts data using AES-256-GCM mode and returns the encrypted data as a base64 encoded string.
@@ -50,6 +72,17 @@ std::vector<unsigned char>
 encrypt_gcm(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
 
 /**
+ * @brief Encrypts data using AES-256-GCM mode and returns the encrypted data as a base64 encoded string.
+ *
+ * @param data Data to encrypt.
+ * @param passphrase Encryption passphrase.
+ * @return Base64 encoded encrypted data.
+ * @throws std::runtime_error on encryption failure.
+ */
+std::string
+encrypt_gcm(const std::string& data, const std::string& passphrase);
+
+/**
  * @brief Decrypts base64 encoded data encrypted with encrypt_gcm() function.
  *
  * @param data Base64 encoded encrypted data.
@@ -59,6 +92,18 @@ encrypt_gcm(const std::vector<unsigned char>& data, const std::vector<unsigned c
  */
 std::vector<unsigned char>
 decrypt_gcm(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
+
+
+/**
+ * @brief Decrypts base64 encoded data encrypted with encrypt_gcm() function.
+ *
+ * @param data Base64 encoded encrypted data.
+ * @param passphrase Passphrase used for encryption.
+ * @return Decrypted plaintext data.
+ * @throws std::runtime_error on decryption or verification failure.
+ */
+std::string
+decrypt_gcm(const std::string& data, const std::string& passphrase);
 
 
 #endif // AESBRIDGE_GCM_HPP

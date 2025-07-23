@@ -168,3 +168,29 @@ decrypt_cbc(const std::vector<unsigned char>& data, const std::vector<unsigned c
     std::vector<unsigned char> decoded_data = base64_decode(data);
     return decrypt_cbc_bin(decoded_data, passphrase);
 }
+
+// Overloaded functions to handle std::string input/output
+
+std::string
+encrypt_cbc_bin(const std::string& data, const std::string& passphrase)
+{
+    return to_string(encrypt_cbc_bin(to_bytes(data), to_bytes(passphrase)));
+}
+
+std::string
+decrypt_cbc_bin(const std::string& data, const std::string& passphrase)
+{
+    return to_string(decrypt_cbc_bin(to_bytes(data), to_bytes(passphrase)));
+}
+
+std::string
+encrypt_cbc(const std::string& data, const std::string& passphrase)
+{
+    return to_string(encrypt_cbc(to_bytes(data), to_bytes(passphrase)));
+}
+
+std::string
+decrypt_cbc(const std::string& data, const std::string& passphrase)
+{
+    return to_string(decrypt_cbc(to_bytes(data), to_bytes(passphrase)));
+}

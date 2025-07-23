@@ -31,6 +31,17 @@ std::vector<unsigned char>
 encrypt_legacy(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
 
 /**
+ * @brief Encrypts plaintext data using AES-256-CBC with a passphrase,
+ * producing an OpenSSL-compatible "Salted__" format, then Base64-encodes the result.
+ * @param data: The plaintext data to encrypt.
+ * @param passphrase: The passphrase for key derivation.
+ * @return: Encrypted data, Base64-encoded.
+ * @throws std::runtime_error on cryptographic operation failure.
+ */
+std::string
+encrypt_legacy(const std::string& data, const std::string& passphrase);
+
+/**
  * @brief Decrypts Base64-encoded AES-256-CBC data using a passphrase,
  * expecting the OpenSSL-compatible "Salted__" format.
  *
@@ -41,6 +52,18 @@ encrypt_legacy(const std::vector<unsigned char>& data, const std::vector<unsigne
  */
 std::vector<unsigned char>
 decrypt_legacy(const std::vector<unsigned char>& data, const std::vector<unsigned char>& passphrase);
+
+/**
+ * @brief Decrypts Base64-encoded AES-256-CBC data using a passphrase,
+ * expecting the OpenSSL-compatible "Salted__" format.
+ *
+ * @param data: The encrypted data, Base64-encoded.
+ * @param passphrase: The passphrase for key derivation.
+ * @return: Decrypted plaintext data. Returns an empty vector if "Salted__" header is missing.
+ * @throws std::runtime_error on cryptographic operation failure (e.g., bad padding, invalid input).
+ */
+std::string
+decrypt_legacy(const std::string& data, const std::string& passphrase);
 
 
 #endif // AESBRIDGE_LEGACY_HPP
