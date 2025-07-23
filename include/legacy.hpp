@@ -16,8 +16,8 @@
  * @return A pair containing the derived key (first) and IV (second) as vectors of unsigned characters.
  * @throws std::runtime_error if the derivation process encounters an error.
  */
-std::pair<std::vector<unsigned char>, std::vector<unsigned char>>
-derive_key_and_iv(const std::vector<unsigned char>& password, const std::vector<unsigned char>& salt);
+// std::pair<std::vector<unsigned char>, std::vector<unsigned char>>
+// derive_key_and_iv(const std::vector<unsigned char>& password, const std::vector<unsigned char>& salt);
 
 /**
  * @brief Encrypts plaintext data using AES-256-CBC with a passphrase,

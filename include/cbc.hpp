@@ -15,8 +15,8 @@
  * @return A pair containing the AES key (first) and HMAC key (second).
  * @throws std::runtime_error if key derivation fails.
  */
-std::pair<std::vector<unsigned char>, std::vector<unsigned char>>
-derive_keys( const std::vector<unsigned char>& passphrase, const std::vector<unsigned char>& salt);
+// std::pair<std::vector<unsigned char>, std::vector<unsigned char>>
+// derive_keys( const std::vector<unsigned char>& passphrase, const std::vector<unsigned char>& salt);
 
 /**
  * @brief Encrypts data using AES-256 CBC mode with PKCS7 padding and HMAC-SHA256 authentication.

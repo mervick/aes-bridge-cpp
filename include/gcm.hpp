@@ -13,8 +13,8 @@
  * @return A derived key as a vector of unsigned characters.
  * @throws std::runtime_error if key derivation fails.
  */
-std::vector<unsigned char>
-derive_key(const std::vector<unsigned char>& passphrase, const std::vector<unsigned char>& salt);
+// std::vector<unsigned char>
+// derive_key(const std::vector<unsigned char>& passphrase, const std::vector<unsigned char>& salt);
 
 /**
  * @brief Encrypts data using AES-256-GCM mode.
