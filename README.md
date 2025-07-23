@@ -61,6 +61,8 @@ int main() {
 
 AesBridge functions support both `std::string` and `std::vector<unsigned char>` for input and output. The input and output types must match — if you pass in a string, you'll receive a string in return; if you pass in a byte vector, you'll get a byte vector back.
 
+---
+
 ### GCM Mode (Recommended)
 
 #### `encrypt_gcm(data, passphrase)`
@@ -103,6 +105,7 @@ Decrypts binary data from `encrypt_gcm_bin()` using the given passphrase.
     - `passphrase`: `std::string` or `std::vector<unsigned char>` – Passphrase used for encryption.
 - **Returns:** `std::string` or `std::vector<unsigned char>` - Plaintext in the same data type as input
 
+---
 
 ### CBC Mode
 
@@ -147,6 +150,7 @@ Decrypts and authenticates binary output from `encrypt_cbc_bin()`.
     - `passphrase`: `std::string` or `std::vector<unsigned char>` – Passphrase used for encryption.
 - **Returns:** `std::string` or `std::vector<unsigned char>` - Plaintext in the same data type as input
 
+---
 
 ### Legacy Compatibility
 
