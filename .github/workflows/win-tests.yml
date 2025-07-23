@@ -16,6 +16,13 @@ jobs:
         choco install ninja
         choco install vcpkg
 
+    - name: Set up vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+        cd C:\vcpkg
+        .\bootstrap-vcpkg.bat
+
+
     - name: Setup vcpkg
       run: |
         $vcpkgRoot = "C:\vcpkg"
