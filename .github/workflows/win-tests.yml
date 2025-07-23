@@ -14,20 +14,17 @@ jobs:
       run: |
         choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
         choco install ninja
-        choco install vcpkg
 
-    - name: Set up vcpkg
+    - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
         cd C:\vcpkg
         .\bootstrap-vcpkg.bat
 
-
     - name: Setup vcpkg
       run: |
-        $vcpkgRoot = "C:\vcpkg"
-        & "$vcpkgRoot\vcpkg.exe" integrate install
-        & "$vcpkgRoot\vcpkg.exe" install gtest nlohmann-json
+        C:\vcpkg\vcpkg.exe integrate install
+        C:\vcpkg\vcpkg.exe install gtest nlohmann-json
 
     - name: Build tests
       run: |
