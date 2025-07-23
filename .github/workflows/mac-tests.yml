@@ -14,7 +14,7 @@ jobs:
       run: |
         brew update
         brew install cmake
-        brew install gtest
+        brew install googletest
         brew install nlohmann-json
         brew install openssl@3
 
