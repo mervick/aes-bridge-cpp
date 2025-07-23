@@ -10,6 +10,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Disable man-db auto-update and reconfigure
+      run: |
+        echo "set man-db/auto-update false" | sudo debconf-communicate
+        sudo dpkg-reconfigure man-db
+        sudo tee /etc/dpkg/dpkg.cfg.d/01_nodoc > /dev/null << 'EOF'
+        path-exclude /usr/share/doc/*
+        path-exclude /usr/share/man/*
+        path-exclude /usr/share/info/*
+        EOF
+
     - name: Install dependencies
       run: |
         sudo apt-get update
