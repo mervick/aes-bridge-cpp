@@ -1,5 +1,3 @@
-#include "common.hpp"
-
 #include <stdexcept>
 #include <iomanip>
 #include <sstream>
@@ -11,6 +9,8 @@
 #include <openssl/buffer.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
+
+#include "common.hpp"
 
 
 static std::vector<unsigned char>

@@ -25,7 +25,6 @@ target_link_libraries(aes_bridge_tests PRIVATE
     nlohmann_json::nlohmann_json
     OpenSSL::Crypto
     OpenSSL::SSL
-    # nlohmann_json::nlohmann_json_headers # Если nlohmann/json был установлен только как header-only
 )
 
 target_include_directories(aes_bridge_tests PRIVATE
