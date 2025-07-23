@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <random>
 
 #include "aesbridge.hpp"
 
@@ -26,6 +27,25 @@ std::vector<unsigned char> stringToBytes(const std::string& str) {
 
 std::string bytesToString(const std::vector<unsigned char>& bytes) {
     return std::string(bytes.begin(), bytes.end());
+}
+
+std::string generateRandomPassword(size_t length) {
+    const std::string charset =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "!@#$%^&*()-_+=<>?{}[]|;:,./~";
+
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<> dist(0, charset.size() - 1);
+
+    std::string password;
+    for (size_t i = 0; i < length; ++i) {
+        password += charset[dist(generator)];
+    }
+
+    return password;
 }
 
 struct TestData {
@@ -61,11 +81,17 @@ TEST_F(AesBridgeTest, PlaintextEncryptCbcNotEmpty) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& plaintexts = test_data_json["testdata"]["plaintext"];
     for (const auto& value_json : plaintexts) {
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+
         std::string value_str = value_json.get<std::string>();
         std::vector<unsigned char> value_bytes = stringToBytes(value_str);
 
-        std::vector<unsigned char> encrypted = encrypt_cbc(value_bytes, value_bytes);
-        ASSERT_FALSE(encrypted.empty()) << "CBC encryption result should not be empty for plaintext: " << value_str;
+        std::vector<unsigned char> encrypted_bytes = encrypt_cbc(value_bytes, passphrase_bytes);
+        ASSERT_FALSE(encrypted_bytes.empty()) << "CBC encryption result should not be empty for plaintext: " << value_str << " , passphrase: " << passphrase;
+
+        std::string encrypted_str = encrypt_cbc(value_str, passphrase);
+        ASSERT_FALSE(encrypted_str.empty()) << "CBC encryption result should not be empty for plaintext: " << value_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -73,11 +99,17 @@ TEST_F(AesBridgeTest, PlaintextEncryptGcmNotEmpty) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& plaintexts = test_data_json["testdata"]["plaintext"];
     for (const auto& value_json : plaintexts) {
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+
         std::string value_str = value_json.get<std::string>();
         std::vector<unsigned char> value_bytes = stringToBytes(value_str);
 
-        std::vector<unsigned char> encrypted = encrypt_gcm(value_bytes, value_bytes);
-        ASSERT_FALSE(encrypted.empty()) << "GCM encryption result should not be empty for plaintext: " << value_str;
+        std::vector<unsigned char> encrypted_bytes = encrypt_gcm(value_bytes, passphrase_bytes);
+        ASSERT_FALSE(encrypted_bytes.empty()) << "GCM encryption result should not be empty for plaintext: " << value_str << " , passphrase: " << passphrase;
+
+        std::string encrypted = encrypt_gcm(value_str, passphrase);
+        ASSERT_FALSE(encrypted.empty()) << "GCM encryption result should not be empty for plaintext: " << value_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -85,11 +117,17 @@ TEST_F(AesBridgeTest, PlaintextEncryptLegacyNotEmpty) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& plaintexts = test_data_json["testdata"]["plaintext"];
     for (const auto& value_json : plaintexts) {
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+
         std::string value_str = value_json.get<std::string>();
         std::vector<unsigned char> value_bytes = stringToBytes(value_str);
 
-        std::vector<unsigned char> encrypted = encrypt_legacy(value_bytes, value_bytes);
-        ASSERT_FALSE(encrypted.empty()) << "Legacy encryption result should not be empty for plaintext: " << value_str;
+        std::vector<unsigned char> encrypted_bytes = encrypt_legacy(value_bytes, passphrase_bytes);
+        ASSERT_FALSE(encrypted_bytes.empty()) << "Legacy encryption result should not be empty for plaintext: " << value_str << " , passphrase: " << passphrase;
+
+        std::string encrypted = encrypt_legacy(value_str, passphrase);
+        ASSERT_FALSE(encrypted.empty()) << "Legacy encryption result should not be empty for plaintext: " << value_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -97,12 +135,19 @@ TEST_F(AesBridgeTest, PlaintextEncryptDecryptCbc) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& plaintexts = test_data_json["testdata"]["plaintext"];
     for (const auto& value_json : plaintexts) {
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+
         std::string value_str = value_json.get<std::string>();
         std::vector<unsigned char> value_bytes = stringToBytes(value_str);
 
-        std::vector<unsigned char> encrypted = encrypt_cbc(value_bytes, value_bytes);
-        std::vector<unsigned char> decrypted = decrypt_cbc(encrypted, value_bytes);
-        ASSERT_EQ(value_bytes, decrypted) << "CBC encryption/decryption failed for plaintext: " << value_str;
+        std::vector<unsigned char> encrypted_bytes = encrypt_cbc(value_bytes, passphrase_bytes);
+        std::vector<unsigned char> decrypted_bytes = decrypt_cbc(encrypted_bytes, passphrase_bytes);
+        ASSERT_EQ(value_bytes, decrypted_bytes) << "CBC encryption/decryption failed for plaintext: " << value_str << " , passphrase: " << passphrase;
+
+        std::string encrypted = encrypt_cbc(value_str, passphrase);
+        std::string decrypted = decrypt_cbc(encrypted, passphrase);
+        ASSERT_EQ(value_str, decrypted) << "CBC encryption/decryption failed for plaintext: " << value_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -110,12 +155,19 @@ TEST_F(AesBridgeTest, PlaintextEncryptDecryptGcm) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& plaintexts = test_data_json["testdata"]["plaintext"];
     for (const auto& value_json : plaintexts) {
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+
         std::string value_str = value_json.get<std::string>();
         std::vector<unsigned char> value_bytes = stringToBytes(value_str);
 
-        std::vector<unsigned char> encrypted = encrypt_gcm(value_bytes, value_bytes);
-        std::vector<unsigned char> decrypted = decrypt_gcm(encrypted, value_bytes);
-        ASSERT_EQ(value_bytes, decrypted) << "GCM encryption/decryption failed for plaintext: " << value_str;
+        std::vector<unsigned char> encrypted_bytes = encrypt_gcm(value_bytes, passphrase_bytes);
+        std::vector<unsigned char> decrypted_bytes = decrypt_gcm(encrypted_bytes, passphrase_bytes);
+        ASSERT_EQ(value_bytes, decrypted_bytes) << "GCM encryption/decryption failed for plaintext: " << value_str << " , passphrase: " << passphrase;
+
+        std::string encrypted = encrypt_gcm(value_str, passphrase);
+        std::string decrypted = decrypt_gcm(encrypted, passphrase);
+        ASSERT_EQ(value_str, decrypted) << "GCM encryption/decryption failed for plaintext: " << value_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -123,12 +175,19 @@ TEST_F(AesBridgeTest, PlaintextEncryptDecryptLegacy) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& plaintexts = test_data_json["testdata"]["plaintext"];
     for (const auto& value_json : plaintexts) {
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
+
         std::string value_str = value_json.get<std::string>();
         std::vector<unsigned char> value_bytes = stringToBytes(value_str);
 
-        std::vector<unsigned char> encrypted = encrypt_legacy(value_bytes, value_bytes);
-        std::vector<unsigned char> decrypted = decrypt_legacy(encrypted, value_bytes);
-        ASSERT_EQ(value_bytes, decrypted) << "Legacy encryption/decryption failed for plaintext: " << value_str;
+        std::vector<unsigned char> encrypted_bytes = encrypt_legacy(value_bytes, passphrase_bytes);
+        std::vector<unsigned char> decrypted_bytes = decrypt_legacy(encrypted_bytes, passphrase_bytes);
+        ASSERT_EQ(value_bytes, decrypted_bytes) << "Legacy encryption/decryption failed for plaintext: " << value_str << " , passphrase: " << passphrase;
+
+        std::string encrypted = encrypt_legacy(value_str, passphrase);
+        std::string decrypted = decrypt_legacy(encrypted, passphrase);
+        ASSERT_EQ(value_str, decrypted) << "Legacy encryption/decryption failed for plaintext: " << value_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -136,11 +195,17 @@ TEST_F(AesBridgeTest, HexEncryptCbcNotEmpty) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& hex_data_array = test_data_json["testdata"]["hex"];
     for (const auto& hex_str_json : hex_data_array) {
-        std::string hex_str = hex_str_json.get<std::string>();
-        std::vector<unsigned char> test_text = hexToBytes(hex_str);
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
 
-        std::vector<unsigned char> encrypted = encrypt_cbc(test_text, test_text);
-        ASSERT_FALSE(encrypted.empty()) << "CBC encryption result should not be empty for hex: " << hex_str;
+        std::string hex_str = hex_str_json.get<std::string>();
+        std::vector<unsigned char> hex_bytes = hexToBytes(hex_str);
+
+        std::vector<unsigned char> encrypted_bytes = encrypt_cbc(hex_bytes, passphrase_bytes);
+        ASSERT_FALSE(encrypted_bytes.empty()) << "CBC encryption result should not be empty for hex: " << hex_str << " , passphrase: " << passphrase;
+
+        std::string encrypted = encrypt_cbc(hex_str, passphrase);
+        ASSERT_FALSE(encrypted.empty()) << "CBC encryption result should not be empty for hex: " << hex_str << " , passphrase: " << passphrase;
     }
 }
 
@@ -148,10 +213,16 @@ TEST_F(AesBridgeTest, HexEncryptGcmNotEmpty) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& hex_data_array = test_data_json["testdata"]["hex"];
     for (const auto& hex_str_json : hex_data_array) {
-        std::string hex_str = hex_str_json.get<std::string>();
-        std::vector<unsigned char> test_text = hexToBytes(hex_str);
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
 
-        std::vector<unsigned char> encrypted = encrypt_gcm(test_text, test_text);
+        std::string hex_str = hex_str_json.get<std::string>();
+        std::vector<unsigned char> hex_bytes = hexToBytes(hex_str);
+
+        std::vector<unsigned char> encrypted_bytes = encrypt_gcm(hex_bytes, passphrase_bytes);
+        ASSERT_FALSE(encrypted_bytes.empty()) << "GCM encryption result should not be empty for hex: " << hex_str;
+
+        std::string encrypted = encrypt_gcm(hex_str, passphrase);
         ASSERT_FALSE(encrypted.empty()) << "GCM encryption result should not be empty for hex: " << hex_str;
     }
 }
@@ -160,10 +231,16 @@ TEST_F(AesBridgeTest, HexEncryptLegacyNotEmpty) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& hex_data_array = test_data_json["testdata"]["hex"];
     for (const auto& hex_str_json : hex_data_array) {
-        std::string hex_str = hex_str_json.get<std::string>();
-        std::vector<unsigned char> test_text = hexToBytes(hex_str);
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
 
-        std::vector<unsigned char> encrypted = encrypt_legacy(test_text, test_text);
+        std::string hex_str = hex_str_json.get<std::string>();
+        std::vector<unsigned char> hex_bytes = hexToBytes(hex_str);
+
+        std::vector<unsigned char> encrypted_bytes = encrypt_legacy(hex_bytes, passphrase_bytes);
+        ASSERT_FALSE(encrypted_bytes.empty()) << "Legacy encryption result should not be empty for hex: " << hex_str;
+
+        std::string encrypted = encrypt_legacy(hex_str, passphrase);
         ASSERT_FALSE(encrypted.empty()) << "Legacy encryption result should not be empty for hex: " << hex_str;
     }
 }
@@ -172,12 +249,19 @@ TEST_F(AesBridgeTest, HexEncryptDecryptCbc) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& hex_data_array = test_data_json["testdata"]["hex"];
     for (const auto& hex_str_json : hex_data_array) {
-        std::string hex_str = hex_str_json.get<std::string>();
-        std::vector<unsigned char> test_text = hexToBytes(hex_str);
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
 
-        std::vector<unsigned char> encrypted = encrypt_cbc(test_text, test_text);
-        std::vector<unsigned char> decrypted = decrypt_cbc(encrypted, test_text);
-        ASSERT_EQ(test_text, decrypted) << "CBC encryption/decryption failed for hex: " << hex_str;
+        std::string hex_str = hex_str_json.get<std::string>();
+        std::vector<unsigned char> hex_bytes = hexToBytes(hex_str);
+
+        std::vector<unsigned char> encrypted_bytes = encrypt_cbc(hex_bytes, passphrase_bytes);
+        std::vector<unsigned char> decrypted_bytes = decrypt_cbc(encrypted_bytes, passphrase_bytes);
+        ASSERT_EQ(hex_bytes, decrypted_bytes) << "CBC encryption/decryption failed for hex: " << hex_str;
+
+        std::string encrypted = encrypt_cbc(hex_str, passphrase);
+        std::string decrypted = decrypt_cbc(encrypted, passphrase);
+        ASSERT_EQ(hex_str, decrypted) << "CBC encryption/decryption failed for hex: " << hex_str;
     }
 }
 
@@ -185,12 +269,19 @@ TEST_F(AesBridgeTest, HexEncryptDecryptGcm) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& hex_data_array = test_data_json["testdata"]["hex"];
     for (const auto& hex_str_json : hex_data_array) {
-        std::string hex_str = hex_str_json.get<std::string>();
-        std::vector<unsigned char> test_text = hexToBytes(hex_str);
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
 
-        std::vector<unsigned char> encrypted = encrypt_gcm(test_text, test_text);
-        std::vector<unsigned char> decrypted = decrypt_gcm(encrypted, test_text);
-        ASSERT_EQ(test_text, decrypted) << "GCM encryption/decryption failed for hex: " << hex_str;
+        std::string hex_str = hex_str_json.get<std::string>();
+        std::vector<unsigned char> hex_bytes = hexToBytes(hex_str);
+
+        std::vector<unsigned char> encrypted_bytes = encrypt_gcm(hex_bytes, passphrase_bytes);
+        std::vector<unsigned char> decrypted_bytes = decrypt_gcm(encrypted_bytes, passphrase_bytes);
+        ASSERT_EQ(hex_bytes, decrypted_bytes) << "GCM encryption/decryption failed for hex: " << hex_str;
+
+        std::string encrypted = encrypt_gcm(hex_str, passphrase);
+        std::string decrypted = decrypt_gcm(encrypted, passphrase);
+        ASSERT_EQ(hex_str, decrypted) << "GCM encryption/decryption failed for hex: " << hex_str;
     }
 }
 
@@ -198,12 +289,19 @@ TEST_F(AesBridgeTest, HexEncryptDecryptLegacy) {
     ASSERT_TRUE(data_loaded) << "Test data not loaded.";
     const auto& hex_data_array = test_data_json["testdata"]["hex"];
     for (const auto& hex_str_json : hex_data_array) {
-        std::string hex_str = hex_str_json.get<std::string>();
-        std::vector<unsigned char> test_text = hexToBytes(hex_str);
+        std::string passphrase = generateRandomPassword(32);
+        std::vector<unsigned char> passphrase_bytes = stringToBytes(passphrase);
 
-        std::vector<unsigned char> encrypted = encrypt_legacy(test_text, test_text);
-        std::vector<unsigned char> decrypted = decrypt_legacy(encrypted, test_text);
-        ASSERT_EQ(test_text, decrypted) << "Legacy encryption/decryption failed for hex: " << hex_str;
+        std::string hex_str = hex_str_json.get<std::string>();
+        std::vector<unsigned char> hex_bytes = hexToBytes(hex_str);
+
+        std::vector<unsigned char> encrypted_bytes = encrypt_legacy(hex_bytes, passphrase_bytes);
+        std::vector<unsigned char> decrypted_bytes = decrypt_legacy(encrypted_bytes, passphrase_bytes);
+        ASSERT_EQ(hex_bytes, decrypted_bytes) << "Legacy encryption/decryption failed for hex: " << hex_str;
+
+        std::string encrypted = encrypt_legacy(hex_str, passphrase);
+        std::string decrypted = decrypt_legacy(encrypted, passphrase);
+        ASSERT_EQ(hex_str, decrypted) << "Legacy encryption/decryption failed for hex: " << hex_str;
     }
 }
 
