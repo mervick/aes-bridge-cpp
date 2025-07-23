@@ -19,7 +19,7 @@ add_executable(aes_bridge_tests
     ../src/legacy.cpp
 )
 
-target_link_libraries(aes_bridge_tests
+target_link_libraries(aes_bridge_tests PRIVATE
     GTest::gtest_main
     GTest::gtest
     nlohmann_json::nlohmann_json
