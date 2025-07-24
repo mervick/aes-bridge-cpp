@@ -23,6 +23,12 @@ int main(int argc, char* argv[]) {
     bool b64_flag = false;
     std::string action;
 
+    // Debug: Print all command line arguments
+    // std::cout << "Command line arguments:" << std::endl;
+    // for (int i = 0; i < argc; ++i) {
+    //     std::cout << "argv[" << i << "]: " << argv[i] << std::endl;
+    // }
+
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "encrypt" || arg == "decrypt") {
