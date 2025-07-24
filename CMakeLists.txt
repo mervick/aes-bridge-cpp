@@ -26,9 +26,15 @@ target_include_directories(AesBridge PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# add_executable(aes_bridge_app src/main.cpp)
-# target_link_libraries(aes_bridge_app PRIVATE AesBridge)
+option(BUILD_AESBRIDGE_CLI "Build CLI for AesBridge library" OFF)
 
-enable_testing()
-add_subdirectory(tests)
+if(BUILD_AESBRIDGE_CLI)
+    add_subdirectory(cli)
+endif()
 
+option(BUILD_AESBRIDGE_TESTS "Build tests for AesBridge library" OFF)
+
+if(BUILD_AESBRIDGE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
