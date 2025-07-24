@@ -34,7 +34,7 @@ target_link_libraries(your_project_name PRIVATE aes-bridge)
 #include <vector>
 #include <iostream>
 
-#include <aesbridge.h>
+#include <aesbridge.hpp>
 
 int main() {
     std::string message = "My secret message";
