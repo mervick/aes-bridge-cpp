@@ -19,7 +19,7 @@ This is the **C++ implementation** of the core project.
 
 ## Installation
 
-To integrate the AesBridge library into your C++ project using CMake, follow these steps.
+To integrate AesBridge into your C++ project using CMake, follow these steps.
 
 Include AesBridge source code into your project
 
