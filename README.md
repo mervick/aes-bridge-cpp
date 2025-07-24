@@ -19,12 +19,32 @@ This is the **C++ implementation** of the core project.
 
 ## Installation
 
-Assuming you're using CMake for your build system, add this project as a Git submodule and include it in your CMake project:
+To integrate the AesBridge library into your C++ project using CMake, follow these steps.
+
+Include AesBridge source code into your project
+
+```sh
+cd path/to/your-project/
+git submodule add https://github.com/mervick/aes-bridge-cpp.git libs/aesbridge
+git submodule update --init --recursive
+```
+
+In your main `CMakeLists.txt`, add `AesBridge` subdirectory and configure the necessary include and link settings
 
 ```cmake
 # CMakeLists.txt
-add_subdirectory(path/to/aes-bridge-cpp)
-target_link_libraries(your_project_name PRIVATE aes-bridge)
+
+# Add the AesBridge library as a subdirectory
+add_subdirectory(libs/aesbridge)
+
+# Link your project to the AesBridge library
+target_include_directories(your_project_name PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs
+)
+
+# Link your target with the AesBridge library
+target_link_libraries(your_project_name PRIVATE AesBridge)
+
 ```
 
 ## Usage
@@ -34,7 +54,7 @@ target_link_libraries(your_project_name PRIVATE aes-bridge)
 #include <vector>
 #include <iostream>
 
-#include <aesbridge.hpp>
+#include "aesbridge/aesbridge.hpp" 
 
 int main() {
     std::string message = "My secret message";
